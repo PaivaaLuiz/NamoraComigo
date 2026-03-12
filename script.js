@@ -1,47 +1,56 @@
 const noBtn = document.getElementById('noBtn');
 const yesBtn = document.getElementById('yesBtn');
 
-/**
- * Função principal para mover o botão.
- * Usamos coordenadas baseadas na janela (viewport) para o mobile.
- */
+// Função para mover o botão NÃO
 function foge(event) {
-    // Impede qualquer comportamento padrão e propagação do toque
+    // Para o evento imediatamente para não clicar em nada atrás
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
 
-    // Pega o tamanho da tela do celular
     const larguraTela = window.innerWidth;
     const alturaTela = window.innerHeight;
 
-    // Calcula limites para o botão não sair da borda (margem de segurança)
+    // Margem de segurança para o botão não sumir nas bordas
     const maxX = larguraTela - noBtn.offsetWidth;
     const maxY = alturaTela - noBtn.offsetHeight;
 
-    // Gera novas coordenadas aleatórias
-    let newX = Math.floor(Math.random() * maxX);
-    let newY = Math.floor(Math.random() * maxY);
+    const newX = Math.random() * maxX;
+    const newY = Math.random() * maxY;
 
-    // Garante que o botão use posicionamento fixo para ignorar o resto do site
     noBtn.style.position = "fixed";
     noBtn.style.left = `${newX}px`;
     noBtn.style.top = `${newY}px`;
-    noBtn.style.zIndex = "1000"; // Sempre por cima de tudo
+    noBtn.style.zIndex = "1000";
 }
 
-// 'pointerdown' funciona tanto para o clique do mouse quanto para o toque do dedo
-// Ele dispara no milissegundo em que o dedo encosta na tela
-noBtn.addEventListener('pointerdown', foge);
+// Evento de toque inicial (o mais rápido no mobile)
+noBtn.addEventListener('touchstart', foge, {passive: false});
 
-// Prevenção extra para o evento de clique padrão
+// Evento de clique (caso o touchstart falhe)
 noBtn.addEventListener('click', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     foge(e);
 });
 
-// Botão SIM redireciona para a página de sucesso
-yesBtn.addEventListener('click', () => {
-    window.location.href = "yes.html";
+// Botão SIM com "Trava de Segurança"
+yesBtn.addEventListener('click', (e) => {
+    // Verifica se o botão NÃO está muito perto do SIM no momento do clique
+    const rectSIM = yesBtn.getBoundingClientRect();
+    const rectNAO = noBtn.getBoundingClientRect();
+
+    // Se houver sobreposição visual no momento do clique, ignoramos o clique no SIM
+    const sobreposicao = !(rectNAO.right < rectSIM.left || 
+                           rectNAO.left > rectSIM.right || 
+                           rectNAO.bottom < rectSIM.top || 
+                           rectNAO.top > rectSIM.bottom);
+
+    if (sobreposicao) {
+        e.preventDefault();
+        foge(); // Move o botão NÃO de novo por segurança
+    } else {
+        window.location.href = "yes.html";
+    }
 });

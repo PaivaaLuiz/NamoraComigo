@@ -1,39 +1,47 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const noBtn = document.getElementById('noBtn');
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
 
-    noBtn.addEventListener('mouseover', () => {
-        // Obter as dimensões do container para limitar o movimento
-        const container = noBtn.parentElement;
-        const containerRect = container.getBoundingClientRect();
-        const btnRect = noBtn.getBoundingClientRect();
+/**
+ * Função principal para mover o botão.
+ * Usamos coordenadas baseadas na janela (viewport) para o mobile.
+ */
+function foge(event) {
+    // Impede qualquer comportamento padrão e propagação do toque
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
 
-        let newX, newY;
+    // Pega o tamanho da tela do celular
+    const larguraTela = window.innerWidth;
+    const alturaTela = window.innerHeight;
 
-        // Tentar encontrar uma posição que não saia do container
-        // E que não sobreponha muito o botão SIM
-        const maxAttempts = 50;
-        let attempts = 0;
+    // Calcula limites para o botão não sair da borda (margem de segurança)
+    const maxX = larguraTela - noBtn.offsetWidth;
+    const maxY = alturaTela - noBtn.offsetHeight;
 
-        do {
-            newX = Math.random() * (containerRect.width - btnRect.width);
-            newY = Math.random() * (containerRect.height - btnRect.height);
+    // Gera novas coordenadas aleatórias
+    let newX = Math.floor(Math.random() * maxX);
+    let newY = Math.floor(Math.random() * maxY);
 
-            // Verificar se a nova posição está muito próxima do botão SIM
-            const yesBtn = document.getElementById('yesBtn');
-            const yesRect = yesBtn.getBoundingClientRect();
+    // Garante que o botão use posicionamento fixo para ignorar o resto do site
+    noBtn.style.position = "fixed";
+    noBtn.style.left = `${newX}px`;
+    noBtn.style.top = `${newY}px`;
+    noBtn.style.zIndex = "1000"; // Sempre por cima de tudo
+}
 
-            const isOverlappingYes = (newX < (yesRect.right - containerRect.left) &&
-                                      (newX + btnRect.width) > (yesRect.left - containerRect.left) &&
-                                      newY < (yesRect.bottom - containerRect.top) &&
-                                      (newY + btnRect.height) > (yesRect.top - containerRect.top));
+// 'pointerdown' funciona tanto para o clique do mouse quanto para o toque do dedo
+// Ele dispara no milissegundo em que o dedo encosta na tela
+noBtn.addEventListener('pointerdown', foge);
 
-            attempts++;
-            if (!isOverlappingYes) break;
+// Prevenção extra para o evento de clique padrão
+noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    foge(e);
+});
 
-        } while (attempts < maxAttempts);
-
-        noBtn.style.position = 'absolute'; // Assegura que está em posicionamento absoluto
-        noBtn.style.left = `${newX}px`;
-        noBtn.style.top = `${newY}px`;
-    });
+// Botão SIM redireciona para a página de sucesso
+yesBtn.addEventListener('click', () => {
+    window.location.href = "yes.html";
 });

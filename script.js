@@ -10,49 +10,47 @@ function foge(event) {
     const larguraTela = window.innerWidth;
     const alturaTela = window.innerHeight;
 
-    // Margens de segurança para o botão não sumir nas bordas (80px)
-    const maxX = larguraTela - noBtn.offsetWidth - 20;
-    const maxY = alturaTela - noBtn.offsetHeight - 20;
-
-    // Pega a posição exata do botão SIM para evitar
+    // Pegamos a posição e tamanho real do botão SIM
     const rectSIM = yesBtn.getBoundingClientRect();
 
     let newX, newY;
-    let tentativa = 0;
-    let posicaoValida = false;
+    let colide = true;
 
-    // Tenta encontrar uma posição que não sobreponha o SIM (máximo 50 tentativas)
-    while (!posicaoValida && tentativa < 50) {
-        newX = Math.random() * maxX;
-        newY = Math.random() * maxY;
+    // Tenta sortear uma posição até que ela esteja fora da área do SIM
+    while (colide) {
+        // Sorteia posição (mantendo 20px de margem das bordas da tela)
+        newX = Math.random() * (larguraTela - noBtn.offsetWidth - 40) + 20;
+        newY = Math.random() * (alturaTela - noBtn.offsetHeight - 40) + 20;
 
-        // Define a área ocupada pelo botão NÃO nessa nova posição hipotética
-        const rectNaoFuturo = {
-            left: newX,
-            top: newY,
-            right: newX + noBtn.offsetWidth,
-            bottom: newY + noBtn.offsetHeight
+        // Criamos uma "zona de exclusão" de 50px ao redor do SIM
+        const zonaExclusao = {
+            top: rectSIM.top - 50,
+            bottom: rectSIM.bottom + 50,
+            left: rectSIM.left - 50,
+            right: rectSIM.right + 50
         };
 
-        // Verifica se essa área encosta no botão SIM (com uma margem extra de 20px)
-        const colidiu = !(rectNaoFuturo.right < rectSIM.left - 20 || 
-                          rectNaoFuturo.left > rectSIM.right + 20 || 
-                          rectNaoFuturo.bottom < rectSIM.top - 20 || 
-                          rectNaoFuturo.top > rectSIM.bottom + 20);
+        // Verifica se o novo ponto do botão NÃO entra na zona do SIM
+        const bateuNoSim = (
+            newX + noBtn.offsetWidth > zonaExclusao.left &&
+            newX < zonaExclusao.right &&
+            newY + noBtn.offsetHeight > zonaExclusao.top &&
+            newY < zonaExclusao.bottom
+        );
 
-        if (!colidiu) {
-            posicaoValida = true;
+        if (!bateuNoSim) {
+            colide = false;
         }
-        tentativa++;
     }
 
+    // Aplica a posição
     noBtn.style.position = "fixed";
     noBtn.style.left = `${newX}px`;
     noBtn.style.top = `${newY}px`;
-    noBtn.style.zIndex = "1000";
+    noBtn.style.zIndex = "9999";
 }
 
-// Eventos para Mobile e PC
+// Eventos de fuga
 noBtn.addEventListener('touchstart', foge, {passive: false});
 noBtn.addEventListener('pointerdown', foge);
 noBtn.addEventListener('click', (e) => {
@@ -60,7 +58,7 @@ noBtn.addEventListener('click', (e) => {
     foge(e);
 });
 
-// Botão SIM livre de interferência
+// Clique no SIM
 yesBtn.addEventListener('click', () => {
     window.location.href = "yes.html";
 });

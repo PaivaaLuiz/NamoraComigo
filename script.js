@@ -1,9 +1,7 @@
 const noBtn = document.getElementById('noBtn');
 const yesBtn = document.getElementById('yesBtn');
 
-// Função para mover o botão NÃO
 function foge(event) {
-    // Para o evento imediatamente para não clicar em nada atrás
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -12,12 +10,41 @@ function foge(event) {
     const larguraTela = window.innerWidth;
     const alturaTela = window.innerHeight;
 
-    // Margem de segurança para o botão não sumir nas bordas
-    const maxX = larguraTela - noBtn.offsetWidth;
-    const maxY = alturaTela - noBtn.offsetHeight;
+    // Margens de segurança para o botão não sumir nas bordas (80px)
+    const maxX = larguraTela - noBtn.offsetWidth - 20;
+    const maxY = alturaTela - noBtn.offsetHeight - 20;
 
-    const newX = Math.random() * maxX;
-    const newY = Math.random() * maxY;
+    // Pega a posição exata do botão SIM para evitar
+    const rectSIM = yesBtn.getBoundingClientRect();
+
+    let newX, newY;
+    let tentativa = 0;
+    let posicaoValida = false;
+
+    // Tenta encontrar uma posição que não sobreponha o SIM (máximo 50 tentativas)
+    while (!posicaoValida && tentativa < 50) {
+        newX = Math.random() * maxX;
+        newY = Math.random() * maxY;
+
+        // Define a área ocupada pelo botão NÃO nessa nova posição hipotética
+        const rectNaoFuturo = {
+            left: newX,
+            top: newY,
+            right: newX + noBtn.offsetWidth,
+            bottom: newY + noBtn.offsetHeight
+        };
+
+        // Verifica se essa área encosta no botão SIM (com uma margem extra de 20px)
+        const colidiu = !(rectNaoFuturo.right < rectSIM.left - 20 || 
+                          rectNaoFuturo.left > rectSIM.right + 20 || 
+                          rectNaoFuturo.bottom < rectSIM.top - 20 || 
+                          rectNaoFuturo.top > rectSIM.bottom + 20);
+
+        if (!colidiu) {
+            posicaoValida = true;
+        }
+        tentativa++;
+    }
 
     noBtn.style.position = "fixed";
     noBtn.style.left = `${newX}px`;
@@ -25,32 +52,15 @@ function foge(event) {
     noBtn.style.zIndex = "1000";
 }
 
-// Evento de toque inicial (o mais rápido no mobile)
+// Eventos para Mobile e PC
 noBtn.addEventListener('touchstart', foge, {passive: false});
-
-// Evento de clique (caso o touchstart falhe)
+noBtn.addEventListener('pointerdown', foge);
 noBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     foge(e);
 });
 
-// Botão SIM com "Trava de Segurança"
-yesBtn.addEventListener('click', (e) => {
-    // Verifica se o botão NÃO está muito perto do SIM no momento do clique
-    const rectSIM = yesBtn.getBoundingClientRect();
-    const rectNAO = noBtn.getBoundingClientRect();
-
-    // Se houver sobreposição visual no momento do clique, ignoramos o clique no SIM
-    const sobreposicao = !(rectNAO.right < rectSIM.left || 
-                           rectNAO.left > rectSIM.right || 
-                           rectNAO.bottom < rectSIM.top || 
-                           rectNAO.top > rectSIM.bottom);
-
-    if (sobreposicao) {
-        e.preventDefault();
-        foge(); // Move o botão NÃO de novo por segurança
-    } else {
-        window.location.href = "yes.html";
-    }
+// Botão SIM livre de interferência
+yesBtn.addEventListener('click', () => {
+    window.location.href = "yes.html";
 });

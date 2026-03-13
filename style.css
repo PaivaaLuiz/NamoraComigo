@@ -1,4 +1,3 @@
-/* Reset básico para garantir que o layout ocupe a tela toda */
 * {
     margin: 0;
     padding: 0;
@@ -10,77 +9,53 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fce4ec; /* Rosa bem clarinho */
-    overflow: hidden; /* Impede scroll enquanto o botão foge */
+    font-family: sans-serif;
+    background-color: #fce4ec;
+    overflow: hidden; /* Evita scroll quando o botão foge */
 }
 
 .container {
-    background-color: #fff;
-    padding: 40px;
+    background-color: white;
+    padding: 30px;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     text-align: center;
-    max-width: 85%;
-    width: 350px;
-    z-index: 1; /* Mantém o card fixo no fundo */
+    width: 300px;
+    z-index: 1;
 }
 
 h1 {
     color: #d81b60;
-    margin-bottom: 40px;
-    font-size: 1.8rem;
-    line-height: 1.2;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
 }
 
 .buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Coloca o SIM em cima do NÃO */
     align-items: center;
-    gap: 20px;
-    min-height: 150px; /* Espaço reservado para os botões */
+    gap: 15px;
+    position: relative;
 }
 
 button {
-    padding: 15px 35px;
+    padding: 15px;
+    width: 100%; /* Botões do mesmo tamanho */
     border: none;
-    border-radius: 50px;
-    font-size: 1.2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s;
-    width: 200px; /* Largura fixa para facilitar o cálculo no JS */
 }
 
 #yesBtn {
     background-color: #4caf50;
     color: white;
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-    position: relative; 
-}
-
-#yesBtn:active {
-    transform: scale(0.95);
 }
 
 #noBtn {
     background-color: #e91e63;
     color: white;
-    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
-    position: fixed; /* O segredo para ele fugir pela tela toda */
-    z-index: 10;
-    /* Posição inicial segura */
-    top: 60%; 
-}
-
-/* Ajustes para telas bem pequenas */
-@media (max-width: 380px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-    
-    button {
-        width: 150px;
-        font-size: 1rem;
-    }
+    position: relative; /* Começa alinhado, muda para fixed no JS */
+    transition: none; /* Movimento instantâneo no mobile é melhor */
 }

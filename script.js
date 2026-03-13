@@ -10,55 +10,38 @@ function foge(event) {
     const larguraTela = window.innerWidth;
     const alturaTela = window.innerHeight;
 
-    // Pegamos a posição e tamanho real do botão SIM
-    const rectSIM = yesBtn.getBoundingClientRect();
+    // Posição do botão SIM para evitar
+    const rectSim = yesBtn.getBoundingClientRect();
 
     let newX, newY;
-    let colide = true;
+    let colidindo = true;
 
-    // Tenta sortear uma posição até que ela esteja fora da área do SIM
-    while (colide) {
-        // Sorteia posição (mantendo 20px de margem das bordas da tela)
+    // Sorteia até achar um lugar longe do botão SIM
+    while (colidindo) {
         newX = Math.random() * (larguraTela - noBtn.offsetWidth - 40) + 20;
         newY = Math.random() * (alturaTela - noBtn.offsetHeight - 40) + 20;
 
-        // Criamos uma "zona de exclusão" de 50px ao redor do SIM
-        const zonaExclusao = {
-            top: rectSIM.top - 50,
-            bottom: rectSIM.bottom + 50,
-            left: rectSIM.left - 50,
-            right: rectSIM.right + 50
-        };
+        // Se a nova posição estiver fora da área do SIM, aceitamos
+        const margem = 60; // Distância mínima entre os botões
+        const foraX = (newX + noBtn.offsetWidth < rectSim.left - margem) || (newX > rectSim.right + margem);
+        const foraY = (newY + noBtn.offsetHeight < rectSim.top - margem) || (newY > rectSim.bottom + margem);
 
-        // Verifica se o novo ponto do botão NÃO entra na zona do SIM
-        const bateuNoSim = (
-            newX + noBtn.offsetWidth > zonaExclusao.left &&
-            newX < zonaExclusao.right &&
-            newY + noBtn.offsetHeight > zonaExclusao.top &&
-            newY < zonaExclusao.bottom
-        );
-
-        if (!bateuNoSim) {
-            colide = false;
+        if (foraX || foraY) {
+            colidindo = false;
         }
     }
 
-    // Aplica a posição
     noBtn.style.position = "fixed";
     noBtn.style.left = `${newX}px`;
     noBtn.style.top = `${newY}px`;
-    noBtn.style.zIndex = "9999";
+    noBtn.style.zIndex = "1000";
 }
 
-// Eventos de fuga
+// Eventos para Mobile
 noBtn.addEventListener('touchstart', foge, {passive: false});
-noBtn.addEventListener('pointerdown', foge);
-noBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    foge(e);
-});
+// Eventos para PC
+noBtn.addEventListener('mouseover', foge);
 
-// Clique no SIM
 yesBtn.addEventListener('click', () => {
     window.location.href = "yes.html";
 });

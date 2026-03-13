@@ -9,43 +9,44 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-family: sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #fce4ec;
-    overflow: hidden; /* Evita scroll quando o botão foge */
+    overflow: hidden; /* Importante para o mobile não dar scroll */
 }
 
 .container {
     background-color: white;
-    padding: 30px;
+    padding: 40px 20px;
     border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     text-align: center;
-    width: 300px;
+    width: 90%;
+    max-width: 320px; /* Largura do card */
     z-index: 1;
 }
 
 h1 {
     color: #d81b60;
     margin-bottom: 30px;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
 }
 
 .buttons {
     display: flex;
-    flex-direction: column; /* Coloca o SIM em cima do NÃO */
+    flex-direction: column; /* SIM em cima, NÃO embaixo */
     align-items: center;
     gap: 15px;
-    position: relative;
 }
 
 button {
     padding: 15px;
-    width: 100%; /* Botões do mesmo tamanho */
+    width: 180px; /* Largura fixa para ambos os botões */
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
+    text-transform: uppercase;
 }
 
 #yesBtn {
@@ -56,6 +57,6 @@ button {
 #noBtn {
     background-color: #e91e63;
     color: white;
-    position: relative; /* Começa alinhado, muda para fixed no JS */
-    transition: none; /* Movimento instantâneo no mobile é melhor */
+    position: relative; /* Começa dentro do card */
+    z-index: 1000;
 }
